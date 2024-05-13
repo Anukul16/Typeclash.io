@@ -1,0 +1,145 @@
+#test-container{
+    /* border: 2px solid red !important; */
+    padding: 1%;
+}
+
+#text-container{
+    /* border: 2px solid blue; */
+    user-select: none;
+    font-weight: 500;
+    font-size: 1.3rem;
+    background: #191919;
+    padding: 0.6rem 1.5rem;
+}
+
+/* #text_highlight{
+    border: 2px solid lightcoral !important;
+    border-radius: 2px;
+    height: 2.25rem;
+    width: 1rem;
+    background:transparent;
+    transition: .12s;
+    z-index: 0;
+    position: absolute;
+} */
+#test-text {
+    text-align: justify;
+    transition: opacity 1s ease; /* Example transition property */
+}
+
+
+
+
+
+
+
+
+
+
+
+
+#test-bar{
+    margin-top: 2%;
+    /* border: 2px solid orange; */
+    display: flex;
+    justify-content: space-evenly;
+    width: 100% !important;
+    padding: 1%;
+}
+
+.input_item{
+    /* border: 2px solid red; */
+    flex: 1.3;
+    display: flex;
+    align-items: center;
+    
+}
+
+
+.input_item > #input_field{
+    width: 90%;
+    height:65px;
+    /* border-color: #2a2828; */
+    border: none;
+    background: #191919;
+    cursor: text;
+    color: whitesmoke;
+    outline: 0;
+    font: inherit;
+    border-radius: 4px;
+    font-size: 1.6rem;
+    padding: 1rem 1.25rem;
+    transition: .25s;
+    border: 2px solid #2a2a2a;
+}
+.input_item > #input_field[type="text"]:focus{
+    border: 3.2px solid #1585E0;
+    border-radius: 4px;
+}
+.bar-items{
+    display: flex;
+    /* border: 2px solid red; */
+    justify-content: space-between;
+    align-items: center;
+    flex: 1;
+    margin-left: 1%;
+    border: none;
+    /* padding: 2%; */
+}
+.speed_classes{
+    /* border: 2px solid blue; */
+    font-size: 1.6rem;
+    font-weight: bold;
+    padding: 3%;
+    background-color: #191919;
+    color: whitesmoke;
+    width: 25%;
+    height: 100%;
+    border: none;
+
+}
+#reset_button{
+    /* border: 2px solid red; */
+    /* font-size: 1.6rem; */
+    font-weight: bold;
+    padding: 3%;
+    background-color: #191919;
+    color: whitesmoke;
+    border: none;
+    width: 15%;
+    height: 100%;
+    border-radius: 4px;
+}
+#reset_button:hover{
+    background-color: #1585E0;
+}
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(-360deg); }
+}
+
+#reset_button .MuiSvgIcon-root {
+    font-size: 2vw;
+    transition: transform 0.5s;
+}
+
+#reset_button.clicked .MuiSvgIcon-root {
+    animation: spin 1s infinite linear;
+}
+
+#wpm_display_container{
+    
+}
+#timer_display_container{
+    
+}
+#reset_button{
+    
+}
+.correct-char {
+    color: green;
+}
+
+.incorrect-char {
+    color: red;
+}
