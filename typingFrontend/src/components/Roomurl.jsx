@@ -3,45 +3,36 @@ import '../styles/Roomurl.css';
 import { useDispatch, useSelector } from 'react-redux';
 import { saveUser } from '../redux/slices/roomSlice';
 import socket from '../sockets/socket';
-import { useParams } from 'react-router-dom';
-import { getUserName,generateRandomID} from '../helpers/Roomurlhelper';
+import { useParams , useNavigate } from 'react-router-dom';
+import { getUserName, generateRandomID } from '../helpers/Roomurlhelper';
 import Joineduser from './Joineduser';
 
-let roomIds = []
 const Roomurl = () => {
   const [roomUrl, setRoomUrl] = useState('');
   const [showButton, setShowButton] = useState(false);
   const [clickedCopyButton, setClickCopyButton] = useState(false);
-  const [showStartGame, setShowStartGame] = useState(true)
+  const [showStartGame, setShowStartGame] = useState(true);
+  const [startingRoomId,setStartingRoomId] = useState(null)
 
   const dispatch = useDispatch();
-  const roomSelector = useSelector((state) => state.room_Slice)
-  console.log(roomSelector);
-  const { id } = useParams()
-  // console.log("Id: ",id);
-
-  // const [roomIds, setRoomIds] = useState(() => {
-  //   // Initialize roomIds array from localStorage on component mount
-  //   const existingIds = localStorage.getItem('roomIds');
-  //   return existingIds ? JSON.parse(existingIds) : [];
-  // });
+  const navigate = useNavigate();
+  const roomSelector = useSelector((state) => state.room_Slice);
+  const { id } = useParams();
+  
   useEffect(() => {
-    console.log("Id: ",id);
     if (id) {
-      const existingIds = localStorage.getItem('roomIds')
-      const existingIdsArray = existingIds ? JSON.parse(existingIds) : [];
-      console.log(existingIdsArray);
-      const isIdPresent = existingIdsArray.includes(id);
-      if (!isIdPresent) {
-        alert("wrong id")
+      const hasId = socket.emit('validateId',id,(resp)=>{
+          return resp.response;
+      })
+      if (!hasId) {
+        alert("wrong id");
         return;
       }
-      setShowStartGame(false)
+      setShowStartGame(false);
       const url = `http://localhost:3000/room/create/${id}`;
       const roomId = id;
       const username = getUserName();
       dispatch(saveUser({ username, roomId }));
-      console.log("Id from if: ", roomId);
       socket.emit("joinroom", {
         username,
         roomId
@@ -49,24 +40,21 @@ const Roomurl = () => {
       setRoomUrl(url);
     } else {
       const roomId = generateRandomID();
+      setStartingRoomId(roomId)
       const url = `http://localhost:3000/room/create/${roomId}`;
       const username = getUserName();
       dispatch(saveUser({ username, roomId }));
-      roomIds.push(roomId);
-      localStorage.setItem('roomIds',JSON.stringify([...roomIds,roomId]))
-      // setRoomIds([...roomIds, roomId]); 
-      // localStorage.setItem('roomIds', JSON.stringify([roomId,...roomIds]));
-      // localStorage.removeItem('roomIds')
-      console.log("Roomids: ",[...roomIds,roomId]);
-
+      
       socket.emit("joinroom", {
         username,
         roomId
       });
       setRoomUrl(url);
     }
+    socket.on('redirect',()=>{
+      navigate('/')
+    })
   }, []);
-
 
   const handleCopy = (e) => {
     e.stopPropagation();
@@ -79,8 +67,13 @@ const Roomurl = () => {
   };
 
   const handleShow = () => {
-    setShowButton(true);
+    setShowButton(!showButton);
   };
+  const handleStart = () => {
+    console.log('start clicked ',startingRoomId);
+    socket.emit("startGame",startingRoomId);
+  }
+  
 
   return (
     <>
@@ -88,19 +81,17 @@ const Roomurl = () => {
         <span>Share this link to invite players</span>
         <span>{clickedCopyButton ? 'Copied!' : 'Click the link to copy!'}</span>
         <div className="lobby-link-container">
-          <span className={!showButton ? 'blur' : ''}>{roomUrl}</span>
+          <span className={!showButton ? 'blur' : 'span'}>{roomUrl}</span>
           <div className="lobby-buttons">
             <button onClick={handleCopy} data-tooltip-id="my-tooltip">Copy</button>
-            <button onClick={handleShow}>Show</button>
+            <button onClick={handleShow}>{showButton ? 'Hide' : 'Show'}</button>
           </div>
         </div>
-        {showStartGame ? <button className='start_btn'>Start Game</button> : null}
+        {showStartGame ? <button className='start_btn' onClick={handleStart}>Start Game</button> : null}
       </div>
-      <Joineduser / >
-    </>
+      <Joineduser />
+    </> 
   );
 };
 
-
 export default Roomurl;
-

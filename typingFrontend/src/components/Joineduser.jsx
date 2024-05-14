@@ -6,12 +6,14 @@ const JoinedUser = () => {
 
   useEffect(() => {
     socket.on('usernames', data => {
+      // console.log("Use:",data.usernames);
       setUsernames(data.usernames);
     });
 
     socket.on('userDisconnected', data => {
       setUsernames(prevUsernames => prevUsernames.filter(username => username !== data.username));
-    });
+  });
+  
 
     return () => {
       socket.off('usernames');
@@ -29,6 +31,7 @@ const JoinedUser = () => {
       </div>
     </div>
   );
+  
 }
 
 const styles = {
