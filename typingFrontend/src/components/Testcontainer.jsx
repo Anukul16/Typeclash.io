@@ -6,6 +6,8 @@ import { ToastContainer, toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css';
 import { useDispatch, useSelector } from 'react-redux';
 import { updateResult } from '../redux/slices/resultContainerSlice';
+import socket from '../sockets/socket';
+import { saveRoomCreationState } from '../redux/slices/roomSlice';
 
 let paraIdx = 0, correctChar = 0, incorrectChar = 0, isPrevCorrect = [], accuracy = 0, wpm = 0, rawWpm = 0;
 
@@ -13,22 +15,25 @@ const Testcontainer = () => {
 
     const dispatch = useDispatch();
     const currSelector = useSelector(state => state.resultContainer)
+    const roomSelector = useSelector(state => state.room_Slice);
     // console.log(currSelector);
     const [timerRunningState, setTimerRunningState] = useState(false)
     const [timer, setTimer] = useState(currSelector.test_duration)
+    const [roomParagraph, setRoomParagraph] = useState('')
+    
 
     useEffect(() => {
-       const checkTimer = () => {
-        if (timerRunningState) {
-            console.log("Timer is running");
-            setTimer(currSelector.test_duration)
-            setTimerRunningState(false)
-        } else {
-            setTimer(currSelector.test_duration)
+        const checkTimer = () => {
+            if (timerRunningState) {
+                console.log("Timer is running");
+                setTimer(currSelector.test_duration)
+                setTimerRunningState(false)
+            } else {
+                setTimer(currSelector.test_duration)
+            }
         }
-       }
-       checkTimer()
-    }, [currSelector.test_duration,currSelector.punctuation,currSelector.numbers,currSelector.words_list]);
+        checkTimer()
+    }, [currSelector.test_duration, currSelector.punctuation, currSelector.numbers, currSelector.words_list]);
     console.log(currSelector);
 
     const inputRef = useRef('');
@@ -82,14 +87,14 @@ const Testcontainer = () => {
     };
 
     const backToDefault = (idx) => {
-        const spanElements = [...spanref.current].slice(0, idx+1);
-            spanElements.forEach((span, index) => {
-                span.style.color = 'whitesmoke';
-            });
+        const spanElements = [...spanref.current].slice(0, idx + 1);
+        spanElements.forEach((span, index) => {
+            span.style.color = 'whitesmoke';
+        });
     }
 
     useEffect(() => {
-        let intervalId; 
+        let intervalId;
 
         if (timerRunningState) {
             const startTimer = () => {
@@ -208,7 +213,12 @@ const Testcontainer = () => {
         return `${formattedMinutes}:${formattedSeconds}`;
     };
 
-
+    socket.on("paragraph", paragraph => {
+        setRoomParagraph(paragraph)
+    })
+    
+    // console.log("RoomPara: ", roomParagraph);
+    // console.log("GameState:",roomSelector.isGameStarted);
     return (
         <>
             <ToastContainer />
@@ -216,7 +226,19 @@ const Testcontainer = () => {
                 <div id="text-container">
                     <div id="text_highlight"></div>
                     <div id="test-text">
-                        {currSelector.paragraph && currSelector.paragraph.split('').map((char, index) => {
+                        {
+                            (roomParagraph || currSelector.paragraph)?.split('').map((char, index) => (
+                                <span
+                                    key={index}
+                                    className='spanchar'
+                                    ref={(el) => spanref.current[index] = el}
+                                >
+                                    {char}
+                                </span>
+                            ))
+                        }
+
+                        {/* {currSelector.paragraph && currSelector.paragraph.split('').map((char, index) => {
                             return (
                                 <span
                                     key={index}
@@ -226,8 +248,7 @@ const Testcontainer = () => {
                                     {char}
                                 </span>
                             );
-                        })}
-
+                        })} */}
                     </div>
 
 
@@ -240,9 +261,9 @@ const Testcontainer = () => {
                             autoComplete='off'
                             onChange={(event) => compareText(event, currSelector.paragraph)}
                             onInput={backspace_clicked}
-                            ref={inputRef} 
-                            onPaste={(e)=>e.preventDefault()}
-                            />
+                            ref={inputRef}
+                            onPaste={(e) => e.preventDefault()}
+                        />
                     </div>
                     <div className="bar-items">
                         <div id="wpm_display_container" className='speed_classes'>
@@ -256,8 +277,7 @@ const Testcontainer = () => {
                     </div>
                 </div>
             </div>
-            <Resultcontainer
-            />
+            <Resultcontainer />
         </>
     )
 }

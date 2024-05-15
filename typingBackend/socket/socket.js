@@ -22,6 +22,7 @@ function setupSocket(io) {
 
             const usernamesInRoom = getUsersInRoom(roomId, socketUsernames);
 
+            
             io.to(roomId).emit('usernames', { usernames: usernamesInRoom });
         });
         socket.on("validateId",(id,callback)=>{
@@ -36,8 +37,12 @@ function setupSocket(io) {
                 })
             }
         })
-        socket.on("startGame",roomId=>{
-            io.to(roomId).emit('redirect')
+        
+        socket.on("startGame",startingRoomId=>{
+            io.to(startingRoomId).emit('redirect')
+            socket.on("sendParagraph",paragraph=>{
+                io.to(startingRoomId).emit("paragraph",paragraph)
+            })
         })
         socket.on("disconnect", () => {
             console.log(`User disconnected with id ${socket.id}`);

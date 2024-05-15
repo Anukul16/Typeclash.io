@@ -37,7 +37,6 @@ const generateRandomParagraph = (punctuation, numbers, words_list) => {
 
     if (words_list === 'simple') {
         filteredParagraph = filteredParagraph.toLowerCase();
-        
     }
 
     return filteredParagraph;

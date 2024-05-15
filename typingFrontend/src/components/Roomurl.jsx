@@ -6,6 +6,7 @@ import socket from '../sockets/socket';
 import { useParams , useNavigate } from 'react-router-dom';
 import { getUserName, generateRandomID } from '../helpers/Roomurlhelper';
 import Joineduser from './Joineduser';
+import { saveGameState } from '../redux/slices/roomSlice';
 
 const Roomurl = () => {
   const [roomUrl, setRoomUrl] = useState('');
@@ -17,6 +18,7 @@ const Roomurl = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const roomSelector = useSelector((state) => state.room_Slice);
+  const currSelector = useSelector(state => state.resultContainer)
   const { id } = useParams();
   
   useEffect(() => {
@@ -44,7 +46,7 @@ const Roomurl = () => {
       const url = `http://localhost:3000/room/create/${roomId}`;
       const username = getUserName();
       dispatch(saveUser({ username, roomId }));
-      
+      socket.emit('roomCreatedBy',username)
       socket.emit("joinroom", {
         username,
         roomId
@@ -70,8 +72,9 @@ const Roomurl = () => {
     setShowButton(!showButton);
   };
   const handleStart = () => {
-    console.log('start clicked ',startingRoomId);
+    // console.log('start clicked ',startingRoomId);
     socket.emit("startGame",startingRoomId);
+    dispatch(saveGameState(true))
   }
   
 

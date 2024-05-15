@@ -1,13 +1,15 @@
-import React, {useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { updateFilterOption } from '../redux/slices/resultContainerSlice';
 import '../styles/Resultcontainer.css';
 import '../styles/Testcontainer.css';
+import socket from '../sockets/socket';
 
 const Resultcontainer = () => {
     const dispatch = useDispatch();
-    const userSettings = useSelector(state => state.resultContainer);
     
+    const userSettings = useSelector(state => state.resultContainer);
+
     const handleFilter = (filter, value) => {
         dispatch(updateFilterOption({ filter, value }));
     };
@@ -19,19 +21,23 @@ const Resultcontainer = () => {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization':`Bearer ${token}`
+                        'Authorization': `Bearer ${token}`
                     },
                     body: JSON.stringify(userSettings)
                 });
                 const data = await resp.json();
-                handleFilter('paragraph',data.paragraph)
+                socket.emit("sendParagraph",data.paragraph)
+                handleFilter('paragraph', data.paragraph)
                 // console.log("Response: ", data);
             } catch (err) {
                 console.error(err);
             }
         };
         sendFilters();
-    }, [userSettings.test_duration,userSettings.punctuation,userSettings.numbers,userSettings.words_list]);
+    }, [userSettings.test_duration, userSettings.punctuation, userSettings.numbers, userSettings.words_list]);
+
+    
+
     return (
         <>
             <div id="results_settings_container" className='container'>
@@ -45,7 +51,7 @@ const Resultcontainer = () => {
                             <ul id="results_list">
                                 <li>
                                     <span>Raw WPM</span>
-                                    <span>{userSettings.rawWpm ? `${userSettings.rawWpm}`:"-"}</span>
+                                    <span>{userSettings.rawWpm ? `${userSettings.rawWpm}` : "-"}</span>
                                 </li>
                                 <li>
                                     <span>Accuracy</span>
@@ -57,7 +63,7 @@ const Resultcontainer = () => {
                                 </li>
                                 <li>
                                     <span>Incorrect Characters</span>
-                                    <span>{userSettings.incorrectChar ? `${userSettings.incorrectChar}` : userSettings.incorrectChar === 0 ? 0:'-'}</span>
+                                    <span>{userSettings.incorrectChar ? `${userSettings.incorrectChar}` : userSettings.incorrectChar === 0 ? 0 : '-'}</span>
                                 </li>
                             </ul>
                         </div>

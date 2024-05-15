@@ -1,7 +1,9 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
-    rooms: {}
+    rooms: {},
+    isRoomCreated:false,
+    isGameStarted:false,
 }
 
 const roomSlice = createSlice({
@@ -15,9 +17,16 @@ const roomSlice = createSlice({
             } else {
                 state.rooms[roomId].push(username);
             }
+        },
+        saveRoomCreationState(state,action){
+            const {resp} = action.payload
+            state.isRoomCreated=resp
+        },
+        saveGameState(state,action){
+            state.isGameStarted=true
         }
     }
 })
 
-export const { saveUser } = roomSlice.actions;
+export const { saveUser,saveRoomCreationState,saveGameState } = roomSlice.actions;
 export default roomSlice.reducer;

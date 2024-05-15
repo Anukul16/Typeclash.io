@@ -96,6 +96,7 @@
     width: 25%;
     height: 100%;
     border: none;
+    align-items: center;
 
 }
 #reset_button{
@@ -142,4 +143,97 @@
 
 .incorrect-char {
     color: red;
+}
+
+
+
+
+
+
+@media screen and (max-width:1200px) {
+    #text-container{
+        font-weight: 400;
+        font-size: 1rem;
+        padding: 0.6rem 1.5rem;
+    }
+    
+    .speed_classes{
+        font-size: 1.2rem;
+        font-weight: bold;
+        background-color: #191919;
+        color: whitesmoke;
+        border: none;
+    
+    }
+    #reset_button{
+        width: 20%;
+        
+    }
+    
+}
+
+@media screen and (max-width:1000px) {
+
+
+    #text-container{
+        user-select: none;
+        font-weight: 400;
+        font-size: 1rem;
+        background: #191919;
+        width: 80vw;
+        
+    }
+
+    .input_item{
+        /* border: 2px solid red; */
+        flex: 3;
+        display: flex;
+        align-items: center;
+        
+    }
+    
+    .input_item > #input_field{
+        width: 100%;
+        height:55px;
+        font: inherit;
+        border-radius: 4px;
+        font-size: 1.3rem;
+        padding: 1rem 1.25rem;
+        transition: .25s;
+        border: 2px solid #2a2a2a;
+    }
+
+    .bar-items{
+        margin-left: 6%;
+        flex: 3;
+        /* border: 2px solid blue; */
+    }
+    .speed_classes{
+        /* border: 2px solid blue; */
+        font-size: 1.1rem;
+        font-weight: bold;
+        /* padding: 3%; */
+        background-color: #191919;
+        color: whitesmoke;
+        width: 25%;
+        height: 100%;
+        border: none;
+        align-items: center;
+    
+    }
+    #reset_button{
+        /* border: 2px solid red; */
+        /* font-size: 1.6rem; */
+        font-weight: bold;
+        padding: 3%;
+        background-color: #191919;
+        color: whitesmoke;
+        border: none;
+        width: 20%;
+        height: 100%;
+        border-radius: 4px;
+    }
+    #test-bar{
+        margin-left: 5%;
+    }
 }
