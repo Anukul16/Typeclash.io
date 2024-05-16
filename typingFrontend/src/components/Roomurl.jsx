@@ -34,7 +34,7 @@ const Roomurl = () => {
       const url = `http://localhost:3000/room/create/${id}`;
       const roomId = id;
       const username = getUserName();
-      dispatch(saveUser({ username, roomId }));
+      // dispatch(saveUser({ username, roomId }));
       socket.emit("joinroom", {
         username,
         roomId,
@@ -46,7 +46,7 @@ const Roomurl = () => {
       setStartingRoomId(roomId)
       const url = `http://localhost:3000/room/create/${roomId}`;
       const username = getUserName();
-      dispatch(saveUser({ username, roomId }));
+      // dispatch(saveUser({ username, roomId }));
       dispatch(saveGameState(true))
       socket.emit("joinroom", {
         username,
@@ -79,9 +79,10 @@ const Roomurl = () => {
     dispatch(saveGameState(true))
   }
   // console.log("RoomState: ",roomSelector.isRoomCreated);
-
+  console.log("Users: ",roomSelector.rooms);
   return (
     <>
+      
       <div className="lobby-wrapper">
         <span>Share this link to invite players</span>
         <span>{clickedCopyButton ? 'Copied!' : 'Click the link to copy!'}</span>
@@ -95,6 +96,7 @@ const Roomurl = () => {
         {showStartGame ? <button className='start_btn' onClick={handleStart}>Start Game</button> : null}
       </div>
       <Joineduser />
+      
     </>
   );
 };

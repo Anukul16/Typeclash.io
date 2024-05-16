@@ -7,9 +7,11 @@ const socket = io("http://localhost:5000");
 
 // Listen for the 'roomJoined' event
 socket.on('usernames', data => {
-    const usernames = data; // Assuming data is directly the usernames array
+    const usernames = data; 
+    // console.log(usernames);
     console.log('Usernames in the room:');
     Object.keys(usernames).forEach(key => {
+        // console.log("Key: ",key);
         console.log(usernames[key]);
     });
 });

@@ -226,13 +226,15 @@ const Testcontainer = () => {
         return `${formattedMinutes}:${formattedSeconds}`;
     };
 
-    socket.on("paragraph", paragraph => {
-        setRoomParagraph(paragraph)
-    })
-    socket.emit('duration',timer)
-    socket.on("testDuration",time=>{
-        setTimer(time)
-    })
+    useEffect(()=>{
+        socket.on("paragraph", paragraph => {
+            setRoomParagraph(paragraph)
+        })
+        socket.emit('duration',currSelector.test_duration)
+        socket.on("testDuration",time=>{
+            setTimer(time)
+        })
+    },[])
     
     // console.log("RoomPara: ", roomParagraph);
     // console.log("GameState:",roomSelector.isGameStarted);

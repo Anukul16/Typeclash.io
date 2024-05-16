@@ -30,7 +30,7 @@ function setupSocket(io) {
             const hasId = localStorage.getItem(id);
             if(hasId){
                 callback({
-                    response:true
+                    response:true 
                 })
             }else{
                 callback({
@@ -47,9 +47,6 @@ function setupSocket(io) {
             socket.on('duration',time=>{
                 io.to(startingRoomId).emit('testDuration',time)
             })
-            // socket.on("selectedTiming",duration =>{
-            //     io.to(startingRoomId).emit("testDuration",duration)
-            // })
         })
         
         socket.on("disconnect", () => {
