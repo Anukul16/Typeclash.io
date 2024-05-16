@@ -7,6 +7,8 @@ import 'react-toastify/dist/ReactToastify.css';
 import { useDispatch, useSelector } from 'react-redux';
 import { updateResult } from '../redux/slices/resultContainerSlice';
 import socket from '../sockets/socket';
+import Waitingtime from '../screens/Waitingtime';
+import { saveWaitingTimerState } from '../redux/slices/roomSlice';
 
 let paraIdx = 0, correctChar = 0, incorrectChar = 0, isPrevCorrect = [], accuracy = 0, wpm = 0, rawWpm = 0;
 
@@ -116,6 +118,7 @@ const Testcontainer = () => {
                                 notify();
                             }
                             dispatch(updateResult({ wpm, rawWpm, accuracy, correctChar, incorrectChar,paraIdx }));
+                            dispatch(saveWaitingTimerState(true))
                             paraIdx = 0; correctChar = 0; incorrectChar = 0; isPrevCorrect = []; accuracy = 0; wpm = 0; rawWpm = 0;
                             return 0;
                         }
@@ -169,7 +172,7 @@ const Testcontainer = () => {
     }
 
     const compareText = (event, paragraph) => {
-
+        
         if (!timerRunningState) {
             setTimerRunningState(true)
         }
@@ -230,11 +233,12 @@ const Testcontainer = () => {
         socket.on("paragraph", paragraph => {
             setRoomParagraph(paragraph)
         })
-        socket.emit('duration',currSelector.test_duration)
-        socket.on("testDuration",time=>{
+        // socket.emit('duration',currSelector.test_duration)
+        socket.on("timing",time=>{
             setTimer(time)
         })
     },[])
+   
     
     // console.log("RoomPara: ", roomParagraph);
     // console.log("GameState:",roomSelector.isGameStarted);
@@ -242,6 +246,7 @@ const Testcontainer = () => {
     return (
         <>
             <ToastContainer />
+            {roomSelector.broadcastToEveryone ? <Waitingtime /> :null}
             <div className='container' id="test-container">
                 <div id="text-container">
                     <div id="text_highlight"></div>
@@ -267,9 +272,10 @@ const Testcontainer = () => {
                             type="text"
                             id='input_field'
                             autoComplete='off'
-                            onChange={(event) => compareText(event, currSelector.paragraph)}
+                            onChange={(event) => compareText(event, roomParagraph)}
                             onInput={backspace_clicked}
                             ref={inputRef}
+                            onKeyDown={roomSelector.isWaitingTimerRunning ? (e) => e.preventDefault() : undefined}
                             onPaste={(e) => e.preventDefault()}
                         />
                     </div>

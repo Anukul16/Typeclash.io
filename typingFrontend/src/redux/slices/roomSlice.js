@@ -1,9 +1,13 @@
 import { createSlice } from "@reduxjs/toolkit";
+import Waitingtime from "../../screens/Waitingtime";
 
 const initialState = {
     rooms: [],
     isRoomCreated:false,
     isGameStarted:false,
+    broadcastToEveryone:false,
+    waitingTime:10,
+    isWaitingTimerRunning:false
 }
 
 const roomSlice = createSlice({
@@ -21,9 +25,25 @@ const roomSlice = createSlice({
         },
         saveGameState(state,action){
             state.isGameStarted=action.payload
+        },
+        broadcast(state,action){
+            state.broadcastToEveryone=action.payload
+        },
+        saveWaitingTime(state,action){
+            state.waitingTime=action.payload
+        },
+        saveWaitingTimerState(state,action){
+            state.isWaitingTimerRunning=action.payload
         }
     }
 })
 
-export const { saveUser,removeUser,saveRoomCreationState,saveGameState } = roomSlice.actions;
+export const { saveUser,
+            removeUser,
+            saveRoomCreationState,
+            saveGameState,
+            broadcast ,
+            saveWaitingTime,
+            saveWaitingTimerState
+            } = roomSlice.actions;
 export default roomSlice.reducer;

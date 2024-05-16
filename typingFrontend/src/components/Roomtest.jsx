@@ -3,7 +3,6 @@ import Testcontainer from './Testcontainer'
 import Resultcontainer from './Resultcontainer'
 import { useSelector } from 'react-redux'
 import JoinedUser from './Joineduser'
-import socket from '../sockets/socket'
 
 const Roomtest = () => {
 
@@ -14,7 +13,7 @@ const Roomtest = () => {
         <JoinedUser />
         <Testcontainer />
         {
-            roomSelector.isGameStarted ? <Resultcontainer /> : null
+          roomSelector.isGameStarted && roomSelector.isWaitingTimerRunning? <Resultcontainer /> : null
         }
     </>
   )

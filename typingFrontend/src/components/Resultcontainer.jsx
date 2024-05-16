@@ -13,9 +13,9 @@ const Resultcontainer = () => {
     const [isOwner, setOwner] = useState(false)
 
     const handleFilter = (filter, value) => {
-        // if (filter === 'test_duration') {
-        //     socket.emit("selectedTiming", value);
-        // }
+        if (filter === 'test_duration') {
+            socket.emit("selectedTiming", value);
+        }
         dispatch(updateFilterOption({ filter, value }));
     };
     useEffect(() => {

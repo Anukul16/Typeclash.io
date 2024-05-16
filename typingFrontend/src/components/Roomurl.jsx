@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import '../styles/Roomurl.css';
 import { useDispatch, useSelector } from 'react-redux';
-import { saveUser } from '../redux/slices/roomSlice';
+import { broadcast, saveUser, saveWaitingTime } from '../redux/slices/roomSlice';
 import socket from '../sockets/socket';
 import { useParams, useNavigate } from 'react-router-dom';
 import { getUserName, generateRandomID } from '../helpers/Roomurlhelper';
@@ -34,6 +34,7 @@ const Roomurl = () => {
       const url = `http://localhost:3000/room/create/${id}`;
       const roomId = id;
       const username = getUserName();
+      dispatch(broadcast(true))
       // dispatch(saveUser({ username, roomId }));
       socket.emit("joinroom", {
         username,
@@ -48,6 +49,7 @@ const Roomurl = () => {
       const username = getUserName();
       // dispatch(saveUser({ username, roomId }));
       dispatch(saveGameState(true))
+      dispatch(broadcast(true))
       socket.emit("joinroom", {
         username,
         roomId,
@@ -78,8 +80,11 @@ const Roomurl = () => {
     socket.emit("startGame", startingRoomId);
     dispatch(saveGameState(true))
   }
+  socket.on('setWaitingTime',time=>{
+    dispatch(saveWaitingTime(time))
+  })
   // console.log("RoomState: ",roomSelector.isRoomCreated);
-  console.log("Users: ",roomSelector.rooms);
+  // console.log("Users: ",roomSelector.rooms);
   return (
     <>
       

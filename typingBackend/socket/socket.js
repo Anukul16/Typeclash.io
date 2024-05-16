@@ -23,7 +23,14 @@ function setupSocket(io) {
 
             const usernamesInRoom = getUsersInRoom(roomId, socketUsernames);
 
-            
+            // socket.on('duration',time => {
+            //     io.to(roomId).emit('testDuration',time)
+            // })
+            socket.on('selectedTiming',timing => {
+                io.to(roomId).emit('timing',timing)
+            })
+            const waitingtime = 15
+            io.to(roomId).emit('setWaitingTime',15);
             io.to(roomId).emit('usernames', { usernames: usernamesInRoom });
         });
         socket.on("validateId",(id,callback)=>{
@@ -44,9 +51,9 @@ function setupSocket(io) {
             socket.on("sendParagraph",paragraph=>{
                 io.to(startingRoomId).emit("paragraph",paragraph)
             })
-            socket.on('duration',time=>{
-                io.to(startingRoomId).emit('testDuration',time)
-            })
+            
+            // const waitingtime = 15
+            // io.to(startingRoomId).emit('setWaitingTime',waitingtime);
         })
         
         socket.on("disconnect", () => {
