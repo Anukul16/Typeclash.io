@@ -10,6 +10,8 @@ import Resetpassword from './components/Resetpassword';
 import Account from './navitems/Account';
 import '../src/sockets/socket'
 import Roomurl from './components/Roomurl';
+import Roomtest from './components/Roomtest';
+import Parent from './components/Parent';
 
 const App = () => {
   return (
@@ -18,11 +20,12 @@ const App = () => {
         <div>
           <Navbar />
           <Routes>
-            <Route exact path="/" element={<Testcontainer />} />
+            <Route exact path="/" element={<Parent />} />
             <Route exact path="/leaderboard" element={<Leaderboard />} />
             <Route exact path="/room" element={<Room />} />
             <Route exact path="/room/create/" element={<Roomurl />} />
             <Route exact path="/room/create/:id" element={<Roomurl />} />
+            <Route exact path="/room/test" element={<Roomtest />} />
             <Route exact path="/login" element={<Login />} />
             <Route exact path="/signup" element={<Signup />} />
             <Route exact path="/account" element={<Account />} />

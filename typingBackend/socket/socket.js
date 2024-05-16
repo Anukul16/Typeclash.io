@@ -4,13 +4,14 @@ if (typeof localStorage === "undefined" || localStorage === null) {
 }
 
 function setupSocket(io) {
-    const socketUsernames = {}; // Modify to store usernames and roomIds
+    const socketUsernames = {}; 
+    
 
     io.on("connection", socket => {
         console.log(`User connected with id ${socket.id}`);
 
         socket.on("joinroom", data => {
-            const { username, roomId } = data;
+            const { username, roomId,isOwner } = data;
             socket.join(roomId);
             console.log(`${username} joined room ${roomId}`);
 
@@ -43,7 +44,14 @@ function setupSocket(io) {
             socket.on("sendParagraph",paragraph=>{
                 io.to(startingRoomId).emit("paragraph",paragraph)
             })
+            socket.on('duration',time=>{
+                io.to(startingRoomId).emit('testDuration',time)
+            })
+            // socket.on("selectedTiming",duration =>{
+            //     io.to(startingRoomId).emit("testDuration",duration)
+            // })
         })
+        
         socket.on("disconnect", () => {
             console.log(`User disconnected with id ${socket.id}`);
         

@@ -3,7 +3,7 @@ import '../styles/Roomurl.css';
 import { useDispatch, useSelector } from 'react-redux';
 import { saveUser } from '../redux/slices/roomSlice';
 import socket from '../sockets/socket';
-import { useParams , useNavigate } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { getUserName, generateRandomID } from '../helpers/Roomurlhelper';
 import Joineduser from './Joineduser';
 import { saveGameState } from '../redux/slices/roomSlice';
@@ -13,18 +13,18 @@ const Roomurl = () => {
   const [showButton, setShowButton] = useState(false);
   const [clickedCopyButton, setClickCopyButton] = useState(false);
   const [showStartGame, setShowStartGame] = useState(true);
-  const [startingRoomId,setStartingRoomId] = useState(null)
+  const [startingRoomId, setStartingRoomId] = useState(null)
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const roomSelector = useSelector((state) => state.room_Slice);
   const currSelector = useSelector(state => state.resultContainer)
   const { id } = useParams();
-  
+
   useEffect(() => {
     if (id) {
-      const hasId = socket.emit('validateId',id,(resp)=>{
-          return resp.response;
+      const hasId = socket.emit('validateId', id, (resp) => {
+        return resp.response;
       })
       if (!hasId) {
         alert("wrong id");
@@ -37,7 +37,8 @@ const Roomurl = () => {
       dispatch(saveUser({ username, roomId }));
       socket.emit("joinroom", {
         username,
-        roomId
+        roomId,
+        isOwner:false
       });
       setRoomUrl(url);
     } else {
@@ -46,15 +47,16 @@ const Roomurl = () => {
       const url = `http://localhost:3000/room/create/${roomId}`;
       const username = getUserName();
       dispatch(saveUser({ username, roomId }));
-      socket.emit('roomCreatedBy',username)
+      dispatch(saveGameState(true))
       socket.emit("joinroom", {
         username,
-        roomId
+        roomId,
+        isOwner:true
       });
       setRoomUrl(url);
     }
-    socket.on('redirect',()=>{
-      navigate('/')
+    socket.on('redirect', () => {
+      navigate('/room/test')
     })
   }, []);
 
@@ -73,10 +75,10 @@ const Roomurl = () => {
   };
   const handleStart = () => {
     // console.log('start clicked ',startingRoomId);
-    socket.emit("startGame",startingRoomId);
+    socket.emit("startGame", startingRoomId);
     dispatch(saveGameState(true))
   }
-  
+  // console.log("RoomState: ",roomSelector.isRoomCreated);
 
   return (
     <>
@@ -93,7 +95,7 @@ const Roomurl = () => {
         {showStartGame ? <button className='start_btn' onClick={handleStart}>Start Game</button> : null}
       </div>
       <Joineduser />
-    </> 
+    </>
   );
 };
 

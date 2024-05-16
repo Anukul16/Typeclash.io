@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { updateFilterOption } from '../redux/slices/resultContainerSlice';
 import '../styles/Resultcontainer.css';
@@ -7,10 +7,15 @@ import socket from '../sockets/socket';
 
 const Resultcontainer = () => {
     const dispatch = useDispatch();
-    
+
     const userSettings = useSelector(state => state.resultContainer);
+    const roomSelector = useSelector(state => state.room_Slice)
+    const [isOwner, setOwner] = useState(false)
 
     const handleFilter = (filter, value) => {
+        // if (filter === 'test_duration') {
+        //     socket.emit("selectedTiming", value);
+        // }
         dispatch(updateFilterOption({ filter, value }));
     };
     useEffect(() => {
@@ -26,7 +31,7 @@ const Resultcontainer = () => {
                     body: JSON.stringify(userSettings)
                 });
                 const data = await resp.json();
-                socket.emit("sendParagraph",data.paragraph)
+                socket.emit("sendParagraph", data.paragraph)
                 handleFilter('paragraph', data.paragraph)
                 // console.log("Response: ", data);
             } catch (err) {
@@ -40,6 +45,8 @@ const Resultcontainer = () => {
 
     return (
         <>
+
+
             <div id="results_settings_container" className='container'>
                 <div id="result_container">
                     <div>
@@ -69,6 +76,7 @@ const Resultcontainer = () => {
                         </div>
                     </div>
                 </div>
+
                 <div id="settings_container">
                     <div id="settings_panel">
                         <ul id="settings_list">
@@ -183,7 +191,10 @@ const Resultcontainer = () => {
                         </ul>
                     </div>
                 </div>
+
+
             </div>
+
         </>
     );
 };

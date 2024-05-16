@@ -19,11 +19,10 @@ const roomSlice = createSlice({
             }
         },
         saveRoomCreationState(state,action){
-            const {resp} = action.payload
-            state.isRoomCreated=resp
+            state.isRoomCreated=action.payload
         },
         saveGameState(state,action){
-            state.isGameStarted=true
+            state.isGameStarted=action.payload
         }
     }
 })

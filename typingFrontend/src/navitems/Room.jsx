@@ -2,13 +2,18 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../styles/Room.css';
 import img from '../assets/pic.jpg';
-
+import { saveRoomCreationState } from '../redux/slices/roomSlice';
+import { useDispatch } from 'react-redux';
 const Room = () => {
   const navigate = useNavigate(); 
-
+  const dispatch = useDispatch();
+  
   const handleCreateRoom = () => {
     navigate('/room/create');
+    dispatch(saveRoomCreationState(true))
   };
+  
+
 
   return (
     <div>

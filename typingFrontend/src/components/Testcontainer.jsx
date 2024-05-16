@@ -7,7 +7,6 @@ import 'react-toastify/dist/ReactToastify.css';
 import { useDispatch, useSelector } from 'react-redux';
 import { updateResult } from '../redux/slices/resultContainerSlice';
 import socket from '../sockets/socket';
-import { saveRoomCreationState } from '../redux/slices/roomSlice';
 
 let paraIdx = 0, correctChar = 0, incorrectChar = 0, isPrevCorrect = [], accuracy = 0, wpm = 0, rawWpm = 0;
 
@@ -18,9 +17,10 @@ const Testcontainer = () => {
     const roomSelector = useSelector(state => state.room_Slice);
     // console.log(currSelector);
     const [timerRunningState, setTimerRunningState] = useState(false)
-    const [timer, setTimer] = useState(currSelector.test_duration)
+    const [timer, setTimer] = useState('')
     const [roomParagraph, setRoomParagraph] = useState('')
-    
+    const inputRef = useRef('');
+    const spanref = useRef([]);
 
     useEffect(() => {
         const checkTimer = () => {
@@ -35,9 +35,17 @@ const Testcontainer = () => {
         checkTimer()
     }, [currSelector.test_duration, currSelector.punctuation, currSelector.numbers, currSelector.words_list]);
     console.log(currSelector);
+    // useEffect(()=>{
+    //     const defaultAfterTest = () => {
+    //         if(timer <= 0){
+    //             console.log("Timer: ",timer);
+    //             inputRef.current.focus()
+    //         }
+    //     }
+    //     defaultAfterTest()
+    // },[currSelector.test_duration,currSelector.punctuation,currSelector.numbers,currSelector.words_list])
 
-    const inputRef = useRef('');
-    const spanref = useRef([]);
+    
 
     if (currSelector.paragraph.length > 0 && inputRef.current) {
         inputRef.current.focus();
@@ -107,7 +115,7 @@ const Testcontainer = () => {
                             if (!localStorage.getItem("logintoken")) {
                                 notify();
                             }
-                            dispatch(updateResult({ wpm, rawWpm, accuracy, correctChar, incorrectChar }));
+                            dispatch(updateResult({ wpm, rawWpm, accuracy, correctChar, incorrectChar,paraIdx }));
                             paraIdx = 0; correctChar = 0; incorrectChar = 0; isPrevCorrect = []; accuracy = 0; wpm = 0; rawWpm = 0;
                             return 0;
                         }
@@ -115,6 +123,7 @@ const Testcontainer = () => {
                         wpm = calculateWordsPerMinute(correctChar, currSelector.test_duration);
                         rawWpm = calculateRawWordsPerMinute(correctChar, incorrectChar, currSelector.test_duration);
                         console.log(accuracy, " ", wpm);
+                        dispatch(updateResult({paraIdx:paraIdx}))
                         return prevSecond - 1;
                     });
                 }, 1000);
@@ -123,7 +132,11 @@ const Testcontainer = () => {
         } else {
             console.log('here');
             inputRef.current.value = ''
-            backToDefault(paraIdx);
+            inputRef.current.disabled=false
+            inputRef.current.focus()
+            // console.log("CurrPara: ",currSelector.paraIdx);
+            backToDefault(currSelector.paraIdx);
+            dispatch(updateResult({wpm:'',rawWpm:'',accuracy:'',correctChar:'',incorrectChar:''}))
             paraIdx = 0; correctChar = 0; incorrectChar = 0; isPrevCorrect = []; accuracy = 0; wpm = 0; rawWpm = 0;
         }
 
@@ -216,6 +229,10 @@ const Testcontainer = () => {
     socket.on("paragraph", paragraph => {
         setRoomParagraph(paragraph)
     })
+    socket.emit('duration',timer)
+    socket.on("testDuration",time=>{
+        setTimer(time)
+    })
     
     // console.log("RoomPara: ", roomParagraph);
     // console.log("GameState:",roomSelector.isGameStarted);
@@ -237,18 +254,6 @@ const Testcontainer = () => {
                                 </span>
                             ))
                         }
-
-                        {/* {currSelector.paragraph && currSelector.paragraph.split('').map((char, index) => {
-                            return (
-                                <span
-                                    key={index}
-                                    className='spanchar'
-                                    ref={(el) => spanref.current[index] = el}
-                                >
-                                    {char}
-                                </span>
-                            );
-                        })} */}
                     </div>
 
 
@@ -277,7 +282,7 @@ const Testcontainer = () => {
                     </div>
                 </div>
             </div>
-            <Resultcontainer />
+            
         </>
     )
 }

@@ -12,7 +12,8 @@ const initialState = {
     rawWpm:'',
     accuracy:'',
     correctChar:'', 
-    incorrectChar:''
+    incorrectChar:'',
+    paraIdx:''
 };
 
 const resultContainerSlice = createSlice({
@@ -24,12 +25,13 @@ const resultContainerSlice = createSlice({
             state[filter] = value;
         },
         updateResult(state, action) {
-            const { wpm, rawWpm, accuracy, correctChar, incorrectChar } = action.payload;
+            const { wpm, rawWpm, accuracy, correctChar, incorrectChar,paraIdx } = action.payload;
             state.wpm = wpm;
             state.rawWpm = rawWpm;
             state.accuracy = accuracy;
             state.correctChar = correctChar;
             state.incorrectChar = incorrectChar;
+            state.paraIdx=paraIdx
         }
         
     }
