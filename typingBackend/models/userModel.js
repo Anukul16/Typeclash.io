@@ -94,4 +94,4 @@ const login = (email, password, callback) => {
     }
 }
 
-module.exports = { signup, login };
+module.exports = {generateUniqueId, signup, login };

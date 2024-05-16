@@ -2,6 +2,7 @@ const express = require('express');
 const app = express();
 const paragraphRouter = require('../typingBackend/routes/paragraphRoute');
 const userRouter = require('../typingBackend/routes/userRoute.js');
+const leaderboardRouter = require('./routes/leaderboardRoute.js')
 const cors = require('cors');
 const path = require('path');
 const db = require('../typingBackend/config/dbconfig.js');
@@ -32,6 +33,7 @@ app.get('/', (req, res) => {
 
 app.use('/api', paragraphRouter);
 app.use('/auth', userRouter);
+app.use('/auth',leaderboardRouter);
 
 // Start server
 const PORT = process.env.PORT || 5000;
