@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import '../styles/Roomurl.css';
 import { useDispatch, useSelector } from 'react-redux';
-import { broadcast, saveUser, saveWaitingTime } from '../redux/slices/roomSlice';
+import { broadcast, saveUser, saveUsername, saveWaitingTime } from '../redux/slices/roomSlice';
 import socket from '../sockets/socket';
 import { useParams, useNavigate } from 'react-router-dom';
 import { getUserName, generateRandomID } from '../helpers/Roomurlhelper';
 import Joineduser from './Joineduser';
 import { saveGameState } from '../redux/slices/roomSlice';
+
+
 
 const Roomurl = () => {
   const [roomUrl, setRoomUrl] = useState('');
@@ -21,6 +23,9 @@ const Roomurl = () => {
   const currSelector = useSelector(state => state.resultContainer)
   const { id } = useParams();
 
+  useEffect(()=>{
+    dispatch(saveUsername(''))
+  },[])
   useEffect(() => {
     if (id) {
       const hasId = socket.emit('validateId', id, (resp) => {
@@ -35,31 +40,42 @@ const Roomurl = () => {
       const roomId = id;
       const username = getUserName();
       dispatch(broadcast(true))
+      console.log("username: ",username);
+      dispatch(saveUsername(username))
       // dispatch(saveUser({ username, roomId }));
       socket.emit("joinroom", {
         username,
         roomId,
+        time:currSelector.test_duration,
         isOwner:false
       });
       setRoomUrl(url);
     } else {
       const roomId = generateRandomID();
+      localStorage.setItem("roomid",roomId)
       setStartingRoomId(roomId)
       const url = `http://localhost:3000/room/create/${roomId}`;
       const username = getUserName();
+      console.log("username: ",username);
       // dispatch(saveUser({ username, roomId }));
       dispatch(saveGameState(true))
+      dispatch(saveUsername(username))
       dispatch(broadcast(true))
       socket.emit("joinroom", {
         username,
         roomId,
+        time:currSelector.test_duration,
         isOwner:true
       });
       setRoomUrl(url);
     }
+    const roomid = localStorage.getItem('roomid')
+    // console.log("from roomurl: ",currSelector.test_duration,"and roomId is : ",roomid);
+    console.log("Username from redux: ",roomSelector.username);
     socket.on('redirect', () => {
       navigate('/room/test')
     })
+    
   }, []);
 
   const handleCopy = (e) => {

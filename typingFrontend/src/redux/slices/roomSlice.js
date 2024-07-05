@@ -1,5 +1,4 @@
 import { createSlice } from "@reduxjs/toolkit";
-import Waitingtime from "../../screens/Waitingtime";
 
 const initialState = {
     rooms: [],
@@ -7,7 +6,9 @@ const initialState = {
     isGameStarted:false,
     broadcastToEveryone:false,
     waitingTime:10,
-    isWaitingTimerRunning:false
+    isWaitingTimerRunning:false,
+    startRoomTest:false,
+    username:''
 }
 
 const roomSlice = createSlice({
@@ -34,11 +35,20 @@ const roomSlice = createSlice({
         },
         saveWaitingTimerState(state,action){
             state.isWaitingTimerRunning=action.payload
+        },
+        startRoomTestFn(state,action){
+            state.startRoomTest=action.payload
+        },
+        saveUsername(state,action){
+            state.username=action.payload
         }
     }
 })
 
-export const { saveUser,
+export const {
+            saveUsername, 
+            saveUser,
+            startRoomTestFn,
             removeUser,
             saveRoomCreationState,
             saveGameState,

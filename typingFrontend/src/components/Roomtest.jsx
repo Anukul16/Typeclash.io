@@ -15,6 +15,7 @@ const Roomtest = () => {
         {
           roomSelector.isGameStarted && roomSelector.isWaitingTimerRunning? <Resultcontainer /> : null
         }
+        {/* <Resultcontainer /> */}
     </>
   )
 }

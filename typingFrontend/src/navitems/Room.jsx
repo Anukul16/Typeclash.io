@@ -1,8 +1,8 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../styles/Room.css';
 import img from '../assets/pic.jpg';
-import { saveRoomCreationState } from '../redux/slices/roomSlice';
+import { saveRoomCreationState, saveUsername } from '../redux/slices/roomSlice';
 import { useDispatch } from 'react-redux';
 const Room = () => {
   const navigate = useNavigate(); 
@@ -13,7 +13,9 @@ const Room = () => {
     dispatch(saveRoomCreationState(true))
   };
   
-
+  useEffect(()=>{
+    dispatch(saveUsername(''))
+  },[])
 
   return (
     <div>

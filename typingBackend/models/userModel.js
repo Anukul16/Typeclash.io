@@ -43,9 +43,9 @@ const signup = (username, email, password, callback) => {
                 callback(error, null);
                 return;
             }
-            const query = 'INSERT INTO user (id, username, email, password, created_at) VALUES (?, ?, ?, ?, ?)';
+            const query = 'INSERT INTO user ( username, email, password, created_at) VALUES ( ?, ?, ?, ?)';
     
-            db.query(query, [userId, username, email, password, createdAt], (err, res) => {
+            db.query(query, [username, email, password, createdAt], (err, res) => {
                 if (err) {
                     callback(err, null);
                     return;

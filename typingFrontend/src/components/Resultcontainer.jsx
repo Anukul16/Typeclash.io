@@ -13,9 +13,7 @@ const Resultcontainer = () => {
     const [isOwner, setOwner] = useState(false)
 
     const handleFilter = (filter, value) => {
-        if (filter === 'test_duration') {
-            socket.emit("selectedTiming", value);
-        }
+        
         dispatch(updateFilterOption({ filter, value }));
     };
     useEffect(() => {
@@ -31,7 +29,8 @@ const Resultcontainer = () => {
                     body: JSON.stringify(userSettings)
                 });
                 const data = await resp.json();
-                socket.emit("sendParagraph", data.paragraph)
+                const roomid = localStorage.getItem("roomid")
+                socket.emit("sendParagraph", data.paragraph,roomid)
                 handleFilter('paragraph', data.paragraph)
                 // console.log("Response: ", data);
             } catch (err) {
@@ -41,8 +40,21 @@ const Resultcontainer = () => {
         sendFilters();
     }, [userSettings.test_duration, userSettings.punctuation, userSettings.numbers, userSettings.words_list]);
 
+    console.log("wpm: ",userSettings.wpm);
+    socket.on('testoff',(roomid)=>{
+        
+        socket.emit("testresult",roomid,{
+            username:roomSelector.username,
+            correctChar: userSettings.correctChar,
+            incorrectChar:userSettings.incorrectChar,
+            accuracy:userSettings.accuracy,
+            wpm:userSettings.wpm,
+        })
+    })
+    socket.on("showresult",result=>{
+        console.log(result);
+    })
     
-
     return (
         <>
 

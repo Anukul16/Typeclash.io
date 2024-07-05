@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import socket from '../sockets/socket';
 import { useDispatch, useSelector } from 'react-redux';
-import { saveWaitingTimerState } from '../redux/slices/roomSlice';
+import { saveWaitingTimerState, startRoomTestFn } from '../redux/slices/roomSlice';
 
 const Waitingtime = () => {
     const roomSelector = useSelector(state => state.room_Slice);
@@ -24,6 +24,7 @@ const Waitingtime = () => {
             setTimeLeft(prevTime => {
                 if (prevTime <= 0) {
                     clearInterval(countdown);
+                    dispatch(startRoomTestFn(true))
                     dispatch(saveWaitingTimerState(false))
                     setShowDiv(false)
                     return 0;

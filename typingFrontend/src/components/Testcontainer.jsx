@@ -9,47 +9,26 @@ import { updateResult } from '../redux/slices/resultContainerSlice';
 import socket from '../sockets/socket';
 import Waitingtime from '../screens/Waitingtime';
 import { saveWaitingTimerState } from '../redux/slices/roomSlice';
+import { useNavigate } from 'react-router-dom';
 
 let paraIdx = 0, correctChar = 0, incorrectChar = 0, isPrevCorrect = [], accuracy = 0, wpm = 0, rawWpm = 0;
-
+let flag= true;
 const Testcontainer = () => {
 
     const dispatch = useDispatch();
+    const navigate = useNavigate()
     const currSelector = useSelector(state => state.resultContainer)
     const roomSelector = useSelector(state => state.room_Slice);
     // console.log(currSelector);
     const [timerRunningState, setTimerRunningState] = useState(false)
     const [timer, setTimer] = useState('')
+    const [roomTimer,setRoomTimer] = useState('')
     const [roomParagraph, setRoomParagraph] = useState('')
     const inputRef = useRef('');
     const spanref = useRef([]);
-
-    useEffect(() => {
-        const checkTimer = () => {
-            if (timerRunningState) {
-                console.log("Timer is running");
-                setTimer(currSelector.test_duration)
-                setTimerRunningState(false)
-            } else {
-                setTimer(currSelector.test_duration)
-            }
-        }
-        checkTimer()
-    }, [currSelector.test_duration, currSelector.punctuation, currSelector.numbers, currSelector.words_list]);
-    console.log(currSelector);
-    // useEffect(()=>{
-    //     const defaultAfterTest = () => {
-    //         if(timer <= 0){
-    //             console.log("Timer: ",timer);
-    //             inputRef.current.focus()
-    //         }
-    //     }
-    //     defaultAfterTest()
-    // },[currSelector.test_duration,currSelector.punctuation,currSelector.numbers,currSelector.words_list])
-
     
 
-    if (currSelector.paragraph.length > 0 && inputRef.current) {
+    if ((currSelector.paragraph.length > 0) && inputRef.current) {
         inputRef.current.focus();
     }
 
@@ -102,6 +81,20 @@ const Testcontainer = () => {
             span.style.color = 'whitesmoke';
         });
     }
+    useEffect(() => {
+        const checkTimer = () => {
+            if (timerRunningState) {
+                console.log("Timer is running");
+                setTimer(currSelector.test_duration)
+                setTimerRunningState(false)
+            } else {
+                setTimer(currSelector.test_duration)
+            }
+        }
+        checkTimer()
+    }, [currSelector.test_duration, currSelector.punctuation, currSelector.numbers, currSelector.words_list]);
+    
+
 
     useEffect(() => {
         let intervalId;
@@ -111,6 +104,11 @@ const Testcontainer = () => {
                 intervalId = setInterval(() => {
                     setTimer((prevSecond) => {
                         if (prevSecond <= 0) {
+                            if(roomSelector.broadcastToEveryone){
+                                // navigate("/room/create")
+                                inputRef.current.value = '';
+                                inputRef.current.disabled = true;
+                            }
                             clearInterval(intervalId);
                             inputRef.current.value = '';
                             inputRef.current.disabled = true;
@@ -135,8 +133,10 @@ const Testcontainer = () => {
         } else {
             console.log('here');
             inputRef.current.value = ''
+            
             inputRef.current.disabled=false
             inputRef.current.focus()
+            
             // console.log("CurrPara: ",currSelector.paraIdx);
             backToDefault(currSelector.paraIdx);
             dispatch(updateResult({wpm:'',rawWpm:'',accuracy:'',correctChar:'',incorrectChar:''}))
@@ -221,7 +221,7 @@ const Testcontainer = () => {
 
 
     const formatSecondsToTimeString = (seconds) => {
-        console.log(seconds);
+        console.log("sec: ", seconds);
         const minutes = Math.floor(seconds / 60);
         const remainingSeconds = seconds % 60;
         const formattedMinutes = minutes < 10 ? String(minutes) : String(minutes).padStart(2, '0');
@@ -230,15 +230,35 @@ const Testcontainer = () => {
     };
 
     useEffect(()=>{
-        socket.on("paragraph", paragraph => {
-            setRoomParagraph(paragraph)
-        })
+
+        socket.emit("sendtime")
+        
         // socket.emit('duration',currSelector.test_duration)
-        socket.on("timing",time=>{
-            setTimer(time)
-        })
+        // socket.emit('selectedTiming',currSelector.test_duration)
+        
     },[])
-   
+    
+    socket.on("paragraph", paragraph => {
+        setRoomParagraph(paragraph)
+    })
+    let roomid = localStorage.getItem('roomid')
+    useEffect(()=>{
+        console.log("Time changes: ",currSelector.test_duration);
+        socket.emit("selectedTiming", currSelector.test_duration,roomid);
+    },[currSelector.test_duration])
+    
+    socket.on("timing",time => {
+        setTimer(time)
+    })
+    // socket.on("timing",time=>{
+    //     if(flag){
+    //         setTimer(time)
+    //         flag=false;
+    //     }
+    //     console.log("TestTime: ",time," ",timer);
+    // })
+    
+    
     
     // console.log("RoomPara: ", roomParagraph);
     // console.log("GameState:",roomSelector.isGameStarted);
@@ -252,7 +272,19 @@ const Testcontainer = () => {
                     <div id="text_highlight"></div>
                     <div id="test-text">
                         {
-                            (roomParagraph || currSelector.paragraph)?.split('').map((char, index) => (
+                            roomSelector.broadcastToEveryone
+                            ?
+                            roomParagraph.split('').map((char, index) => (
+                                <span
+                                    key={index}
+                                    className='spanchar'
+                                    ref={(el) => spanref.current[index] = el}
+                                >
+                                    {char}
+                                </span>
+                            ))
+                            :
+                            currSelector.paragraph.split('').map((char, index) => (
                                 <span
                                     key={index}
                                     className='spanchar'
@@ -272,10 +304,10 @@ const Testcontainer = () => {
                             type="text"
                             id='input_field'
                             autoComplete='off'
-                            onChange={(event) => compareText(event, roomParagraph)}
+                            onChange={(event) => roomSelector.broadcastToEveryone ? compareText(event, roomParagraph):compareText(event,currSelector.paragraph)}
                             onInput={backspace_clicked}
                             ref={inputRef}
-                            onKeyDown={roomSelector.isWaitingTimerRunning ? (e) => e.preventDefault() : undefined}
+                            // onKeyDown={roomSelector.isWaitingTimerRunning ? (e) => e.preventDefault() : null}
                             onPaste={(e) => e.preventDefault()}
                         />
                     </div>
@@ -284,7 +316,7 @@ const Testcontainer = () => {
                             {currSelector.show_wpm === 'show' ? <span>{wpm} <small>WPM</small></span> : ""}
                         </div>
                         <div id="timer_display_container" className='speed_classes'>
-                            {currSelector.show_timer === 'show' ? formatSecondsToTimeString(timer) : ""}
+                            {currSelector.show_timer === 'show' ? formatSecondsToTimeString(timer): ""}
                         </div>
 
                         <button id="reset_button"><LoopIcon /></button>
